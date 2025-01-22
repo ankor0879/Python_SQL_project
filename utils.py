@@ -1,11 +1,13 @@
+import sys
 import logging
 
 def safe_execute(func):
     """
-    Decorator to safely execute a function and handle errors.
+    Decorator to print the message
+    from the raised exception in the wrapped function.
 
     Args:
-        func: The function to wrap.
+        func: The function to decorate.
 
     Returns:
         The wrapped function.
@@ -13,8 +15,14 @@ def safe_execute(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except ConnectionError as e:
+            print(f"Critical error: {e}")
+            sys.exit(1)
+        except RuntimeError as e:
+            print(f"Difficulties with getting results, try another search")
+            return None
         except Exception as e:
-            print("An error occurred while processing your request. Please try again.")
-            logging.error(f"Error in {func.__name__}: {e}")
+            logging.error(f"Unexpexted error: {e}")
+            print(f"Difficulties with getting results, try another search")
             return None
     return wrapper

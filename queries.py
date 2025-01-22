@@ -15,7 +15,7 @@ VALUES (%s, %s);
 
 category_list = "SELECT category_id, name FROM category;"
 
-search_by_category = """
+search_by_category= """
 SELECT f.title, f.release_year, f.description
 FROM film AS f
 JOIN film_category AS fc ON f.film_id = fc.film_id

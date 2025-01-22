@@ -35,9 +35,17 @@ class ConnectionManager:
         Initializes the ConnectionManager and connects to the databases.
         """
         self.connections: Dict[str, mysql.connector.MySQLConnection] = {}
-        self._connect_to_databases()
+        self.initialize_connections()
         self.main_db = "sakila"  # Main database name
         self.log_db = "queries"  # Logging database name
+
+
+    @safe_execute
+    def initialize_connections(self):
+        """
+        Initializes database connections using the _connect_to_databases method.
+        """
+        self._connect_to_databases()
 
     def _connect_to_databases(self) -> None:
         """
@@ -62,8 +70,9 @@ class ConnectionManager:
             )
         except Error as e:
             logging.error(f"Database connection error: {e}")
-            raise
+            raise ConnectionError("Sorry! Failed to connect to one or more databases. Please, try next time") from e 
 
+    @safe_execute
     def get_connection(self, db_name: str) -> mysql.connector.MySQLConnection:
         """
         Retrieves a connection to the specified database.
@@ -79,7 +88,7 @@ class ConnectionManager:
         """
         connection = self.connections.get(db_name)
         if not connection:
-            raise ValueError(f"No connection to database: {db_name}")
+            raise ConnectionError(f"No connection to database: {db_name}")
         return connection
 
     def close_connections(self) -> None:
@@ -89,7 +98,6 @@ class ConnectionManager:
         for name, connection in self.connections.items():
             if connection.is_connected():
                 connection.close()
-                logging.info(f"Connection to database {name} closed.")
 
                 
 class QueryExecutor:
@@ -133,7 +141,7 @@ class QueryExecutor:
                 return cursor.fetchall()
         except Error as e:
             logging.error(f"Query execution error (SELECT): {e}")
-            raise
+            raise RuntimeError from e
 
     @safe_execute
     def execute_non_select(self, db_name: str, query: str, params: Optional[tuple] = None) -> None:
@@ -155,7 +163,7 @@ class QueryExecutor:
                 connection.commit()
         except Error as e:
             logging.error(f"Query execution error (Non-SELECT): {e}")
-            raise
+            raise RuntimeError from e
 
 
 # In[ ]:

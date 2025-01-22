@@ -91,8 +91,9 @@ def display_results(results: List[Tuple], headers: List[str]) -> None:
         headers (List[str]): The headers for the columns.
     """
     if not results:
-        print("No results found.")
         return
+    if results is None:
+        return    
 
     print("\n" + " | ".join(headers))
     print("-" * (len(headers) * 15))
@@ -101,7 +102,7 @@ def display_results(results: List[Tuple], headers: List[str]) -> None:
         print(" | ".join(str(item) for item in row))
 
 
-def display_with_limit(results: list, headers: list, limit: int = 10):
+def display_with_limit(results: list, headers: list, limit: int = 10) -> None:
     """
     Displays the first `limit` results and provides an option to display all remaining.
 
@@ -110,6 +111,9 @@ def display_with_limit(results: list, headers: list, limit: int = 10):
         headers (list): List of column headers.
         limit (int): Number of results to display initially.
     """
+    if results is None:
+        return
+    
     total_results = len(results)
 
     print("\n" + "-" * 50)
